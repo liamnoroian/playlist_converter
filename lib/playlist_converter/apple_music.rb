@@ -4,12 +4,13 @@ require 'faraday_middleware'
 require 'openssl'
 
 module AppleMusic
-  API_URI = 'https://api.music.apple.com/v1/'
+  API_URI = 'https://api.music.apple.com/v1/'.freeze
+
   class Config
     attr_accessor :auth_token
 
     def initialize
-      @auth_token = get_auth_token
+      get_auth_token
     end
 
     def get_auth_token
@@ -25,15 +26,11 @@ module AppleMusic
         exp: Time.now.to_i + token_expiration_time
       }
 
-      JWT.encode(payload, private_key, algorithm, kid: key_id)
+      @auth_token = JWT.encode(payload, private_key, algorithm, kid: key_id)
     end
   end
 
   class << self
-    def initialize
-      @auth_token = get_auth_token
-    end
-
     def config
       @config ||= Config.new
     end
